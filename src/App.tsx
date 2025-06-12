@@ -159,6 +159,7 @@ export default function App() {
       {error && (
         <pre className="error">
           {error.message}
+          {error.code}
           {error.response ? "\nStatus: " + error.response.status : ""}
         </pre>
       )}
