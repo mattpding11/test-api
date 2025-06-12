@@ -89,6 +89,7 @@ export default function App() {
       } else {
         setError(null); // otro tipo → lo descartas o lo manejas aparte
       }
+      console.log("ERROR", err)
     } finally {
       setLoading(false);
     }
