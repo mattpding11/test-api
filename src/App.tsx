@@ -20,7 +20,7 @@ export default function App() {
   const agentClient = axios.create({
     baseURL: URL_API_VALIDATOR_AGENT,
     headers: { "Content-Type": "application/json" },
-    timeout: 10_000, // evita cuelgues infinitos
+    timeout: 10000000, // evita cuelgues infinitos
     // validateStatus: () => true,  // descomenta si NO quieres que Axios lance on 4xx/5xx
   });
 
