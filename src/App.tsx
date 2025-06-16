@@ -1,12 +1,13 @@
 // src/App.jsx
-import { useState } from "react";
-import axios, { AxiosError } from "axios";
+import { useEffect, useState } from "react";
+import axios, { AxiosError, type RawAxiosRequestHeaders } from "axios";
 import "./App.css";
 
 // http://localhost:4000/api/v1/test
 // https://reqres.in/api/users
 
 export default function App() {
+  const URL_API_VALIDATOR_AGENT = "http://localhost:5555/api/v1";
   const [method, setMethod] = useState("GET");
   const [url, setUrl] = useState("");
   const [headers, setHeaders] = useState([{ id: 0, key: "", value: "" }]);
@@ -14,6 +15,61 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | null>(null);
   const [response, setResponse] = useState<any>(null);
+  const [agentAvailable, setAgentAvailable] = useState<boolean>(false);
+
+  const agentClient = axios.create({
+    baseURL: URL_API_VALIDATOR_AGENT,
+    headers: { "Content-Type": "application/json" },
+    timeout: 10_000, // evita cuelgues infinitos
+    // validateStatus: () => true,  // descomenta si NO quieres que Axios lance on 4xx/5xx
+  });
+
+  console.log({ agentClient });
+
+  // Comprobar AGENTE
+  useEffect(() => {
+    agentClient
+      .get("/test")
+      .then((resp) => {
+        console.log("RESPUESTA OBTENIDA ", { resp });
+        setAgentAvailable(true);
+      })
+      .catch((err) => {
+        console.log("ERROR DE CONEXION ", { err });
+        setAgentAvailable(false);
+      });
+  }, [agentClient]);
+
+  console.log({ agentAvailable });
+
+  if (agentAvailable) {
+    console.log("AGENTE CONECTADO");
+
+    agentClient
+      .options("/preflight")
+      .then((res) => {
+        console.log("preflight: ", { res });
+      })
+      .catch((err) => {
+        console.log("Error preflight: ", { err });
+      });
+  } else {
+    console.log("AGENTE DESCONECTADO");
+  }
+
+
+  const sendViaAgent = async( method: string, url: string, headers: RawAxiosRequestHeaders = {}, body: any = null) => {
+    const { data } = await agentClient.post('/proxy', {
+      method: method.toUpperCase(), // homogeniza
+      url,
+      headers,
+      body,
+    });
+
+    console.log("FINAL RESPONSE", data)
+
+    return data; 
+  }
 
   /* ---------- helpers ---------- */
   const updateHeader = (i: number, field: string, value: string) => {
@@ -27,46 +83,46 @@ export default function App() {
   // const removeHeaderRow = () =>
   //   setHeaders((h) => (h.length > 1 ? h.slice(0, -1) : h));
 
-    const removeHeaderRow = () => {
-      if(headers.length > 1){
-         return setHeaders((h) => h.slice(0,-1))
-      }else{
-        return setHeaders([{ id: 0, key: "", value: "" }]);
-      }
+  const removeHeaderRow = () => {
+    if (headers.length > 1) {
+      return setHeaders((h) => h.slice(0, -1));
+    } else {
+      return setHeaders([{ id: 0, key: "", value: "" }]);
     }
+  };
 
-
-  console.log(headers);
-  console.log(headers.length);
+  console.log({ headers });
+  console.log("headers lenght: ", headers.length);
 
   const getCleanHeaders = (): any => {
-
-    if(headers[0].key.length != 0 && headers[0].value.length != 0){
-    const acc: any = {};
-        headers.forEach(({ key, value }) => {
-          if (key.trim()) acc[key] = value;
-        });
+    if (headers[0].key.length != 0 && headers[0].value.length != 0) {
+      const acc: any = {};
+      headers.forEach(({ key, value }) => {
+        if (key.trim()) acc[key] = value;
+      });
       return acc;
-    }else{
-      return null
+    } else {
+      return null;
     }
-
   };
 
   /* ---------- main action ---------- */
   const send = async () => {
+
     setLoading(true);
     setError(null);
     setResponse(null);
+
     try {
+
       const options: any = {
         method,
         url,
-        // headers: getCleanHeaders(),
       };
 
-      const headers = getCleanHeaders()
-      if(headers) {
+      const headers = getCleanHeaders();
+
+      if (headers) {
         options.headers = headers;
       }
 
@@ -80,8 +136,9 @@ export default function App() {
         }
       }
 
-      console.log("REQ AXIOS", options)
-      const res: any = await axios(options);
+      console.log("REQ AXIOS", options);
+      const res: any = await sendViaAgent(options.method, options.url, options.headers || {}, options.data || null);
+      // const res: any = await axios(options);
       setResponse(res);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -89,7 +146,7 @@ export default function App() {
       } else {
         setError(null); // otro tipo → lo descartas o lo manejas aparte
       }
-      console.log("ERROR", err)
+      console.log("ERROR", err);
     } finally {
       setLoading(false);
     }
@@ -165,7 +222,6 @@ export default function App() {
       )}
       {response && (
         <pre className="success">
-
           {/* status */}
           {`Status HTTP: ${response.status} / ${response.statusText}\n\n`}
 
@@ -176,11 +232,11 @@ export default function App() {
               .join("\n")}
 
           {/* body response */}
+
           {"\n\n Response: \n"}
           {typeof response.data === "object"
             ? JSON.stringify(response.data, null, 2)
             : String(response.data)}
-
         </pre>
       )}
     </div>
