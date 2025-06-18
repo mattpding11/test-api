@@ -184,7 +184,7 @@ export default function App() {
     &#x2713; // Check */}
 </span>
       <h4 style={ agentAvailable ? 
-        { color:"green"} : {color: "red"}}> Agente 
+        { color:"green"} : {color: "red"}}>Agente     
         {agentAvailable ? "Conectado"
          : "Desconectado"}</h4>
       <div className="row">
