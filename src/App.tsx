@@ -58,11 +58,12 @@ export default function App() {
     console.log("AGENTE DESCONECTADO");
   }
 
-  
+
 
 
   const sendViaAgent = async( method: string, url: string, headers: RawAxiosRequestHeaders = {}, body: any = null) => 
     {
+      console.log("COMO ENTRO", body)
     const { data } = await agentClient.post('/proxy', {
       method: method.toUpperCase(), // homogeniza
       url,
@@ -130,21 +131,28 @@ export default function App() {
 
       if (headers) {
         options.headers = headers;
+      }else{
+        options.headers = {};
       }
 
-      console.log("METODO", method)
+      console.log("METODO", method);
+      console.log("HOLA", body)
+
+
 
       if (method === "POST" && body.trim() !== "") {
         try {
+          console.log("in1")
           options.data = JSON.parse(body);
-          options.headers["Content-Type"] =
-            options.headers["Content-Type"] || "application/json";
-        } catch {
+          console.log("TRANS",options.data)
+          options.headers["Content-Type"] = options.headers["Content-Type"] ? options.headers["Content-Type"] : "application/json";
+        } catch(e) {
+          console.log("FAILLLL",e)
           options.data = body;
         }
       }
 
-      console.log("REQ AXIOS", options);
+      console.log("REQ AXIOS", options.data);
       const res: any =  await sendViaAgent(options.method, options.url, options.headers || {}, options.data || null);
       // const res: any = await axios(options);
       setResponse(res);
