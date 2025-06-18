@@ -7,7 +7,6 @@ import "./App.css";
 // https://reqres.in/api/users
 
 export default function App() {
-
   const URL_API_VALIDATOR_AGENT = "http://localhost:5555/api/v1";
   const [method, setMethod] = useState("GET");
   const [url, setUrl] = useState("");
@@ -58,9 +57,27 @@ export default function App() {
     console.log("AGENTE DESCONECTADO");
   }
 
+  // Campos que acepta
+  // method = "GET",
+  // url,
+  // headers = {},
+  // body,
+  // maxContentLength,
+  // maxBodyLength,
+  // responseType,
+  // validateStatus,
+  // httpAgent,
+  // httpsAgent,
+  // clientCert, // opcional, base64
+  // clientKey, // opcional, base64
+  // clientCa, // opcional, base64
 
-  const sendViaAgent = async( method: string, url: string, headers: RawAxiosRequestHeaders = {}, body: any = null) => 
-    {
+  const sendViaAgent = async (
+    method: string,
+    url: string,
+    headers: RawAxiosRequestHeaders = {},
+    body: any = null
+  ) => {
     console.log("PETICION ENVIANTE", {
       method: method.toUpperCase(),
       url,
@@ -68,17 +85,17 @@ export default function App() {
       body,
     });
 
-    const { data } = await agentClient.post('/proxy', {
+    const { data } = await agentClient.post("/proxy", {
       method: method.toUpperCase(), // homogeniza
       url,
       headers,
       body,
     });
 
-    console.log("FINAL RESPONSE", data)
+    console.log("FINAL RESPONSE", data);
 
-    return data; 
-  }
+    return data;
+  };
 
   /* ---------- helpers ---------- */
   const updateHeader = (i: number, field: string, value: string) => {
@@ -116,16 +133,14 @@ export default function App() {
   };
 
   /* ---------- main action ---------- */
-  const send =  async () => {
-
-    console.log("ADENTRO")
+  const send = async () => {
+    console.log("ADENTRO");
 
     setLoading(true);
     setError(null);
     setResponse(null);
 
     try {
-
       const options: any = {
         method,
         url,
@@ -135,62 +150,61 @@ export default function App() {
 
       if (headers) {
         options.headers = headers;
-      }else{
+      } else {
         options.headers = {};
       }
 
       console.log("METODO", method);
-      console.log("HOLA", body)
-
-
+      console.log("HOLA", body);
 
       if (method === "POST" && body.trim() !== "") {
         try {
-          console.log("in1")
+          console.log("in1");
           options.data = JSON.parse(body);
-          console.log("TRANS",options.data)
-          options.headers["Content-Type"] = options.headers["Content-Type"] ? options.headers["Content-Type"] : "application/json";
-        } catch(e) {
-          console.log("FAILLLL",e)
+          console.log("TRANS", options.data);
+          options.headers["Content-Type"] = options.headers["Content-Type"]
+            ? options.headers["Content-Type"]
+            : "application/json";
+        } catch (e) {
+          console.log("FAILLLL", e);
           options.data = body;
         }
       }
 
       console.log("REQ AXIOS", options.data);
-      const res: any =  await sendViaAgent(options.method, options.url, options.headers || {}, options.data || null);
+      const res: any = await sendViaAgent(
+        options.method,
+        options.url,
+        options.headers || {},
+        options.data || null
+      );
       // const res: any = await axios(options);
       setResponse(res);
-
     } catch (err) {
-
       if (axios.isAxiosError(err)) {
         setError(err); // err es AxiosError
       } else {
         setError(null); // otro tipo → lo descartas o lo manejas aparte
       }
       console.log("ERROR en Consumir Servicio dinamico de usuario", err);
-
     } finally {
-
       setLoading(false);
-      
     }
   };
-
 
   /* ---------- UI ---------- */
   return (
     <div className="container">
       <h1>API VALIDATOR TEST</h1>
-      <span style={{"font": "24px"}}>
-    {/* &#x2717; // Equis (X)
+      <span style={{ font: "24px" }}>
+        {/* &#x2717; // Equis (X)
     <br/>
     &#x2713; // Check */}
-</span>
-      <h4 style={ agentAvailable ? 
-        { color:"green"} : {color: "red"}}>Agente     
-        {agentAvailable ? "Conectado"
-         : "Desconectado"}</h4>
+      </span>
+      <h4 style={agentAvailable ? { color: "green" } : { color: "red" }}>
+        Agente
+        {agentAvailable ? "Conectado" : "Desconectado"}
+      </h4>
       <div className="row">
         <select value={method} onChange={(e) => setMethod(e.target.value)}>
           <option>GET</option>
@@ -261,10 +275,12 @@ export default function App() {
           {`Status HTTP: ${response.status} / ${response.statusText}\n\n`}
 
           {/* headers */}
-          {response.headers ? "Headers: \n\n" +
-            Object.entries(response.headers)
-              .map(([k, v]) => `${k} : ${v}`)
-              .join("\n"): ""} 
+          {response.headers
+            ? "Headers: \n\n" +
+              Object.entries(response.headers)
+                .map(([k, v]) => `${k} : ${v}`)
+                .join("\n")
+            : ""}
 
           {/* body response */}
 
@@ -278,8 +294,8 @@ export default function App() {
   );
 }
 
-
-{/* <h4 style={agentAvailable ? { color: "gray" } : { color: "red" }}>
+{
+  /* <h4 style={agentAvailable ? { color: "gray" } : { color: "red" }}>
   Agente{" "}
   {agentAvailable ? (
     <>
@@ -290,7 +306,8 @@ export default function App() {
       Desconectado <span>&nbsp;</span>
     </>
   )}
-</h4> */}
+</h4> */
+}
 
 //or
 
