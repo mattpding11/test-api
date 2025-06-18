@@ -18,6 +18,9 @@ select,
 textarea {
     padding: .4rem;
     font: inherit;
+}
+
+textarea{
     width: 294px; height: 162px;
 }
 

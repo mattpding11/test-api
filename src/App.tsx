@@ -59,11 +59,15 @@ export default function App() {
   }
 
 
-
-
   const sendViaAgent = async( method: string, url: string, headers: RawAxiosRequestHeaders = {}, body: any = null) => 
     {
-      console.log("COMO ENTRO", body)
+    console.log("PETICION ENVIANTE", {
+      method: method.toUpperCase(),
+      url,
+      headers,
+      body,
+    });
+
     const { data } = await agentClient.post('/proxy', {
       method: method.toUpperCase(), // homogeniza
       url,
