@@ -18,6 +18,7 @@ select,
 textarea {
     padding: .4rem;
     font: inherit;
+    width: 294px; height: 162px;
 }
 
 button {

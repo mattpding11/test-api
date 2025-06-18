@@ -231,7 +231,7 @@ export default function App() {
         <>
           <h2>Body</h2>
           <textarea
-            rows={6}
+            rows={10}
             placeholder="{key: value}"
             value={body}
             onChange={(e) => setBody(e.target.value)}
