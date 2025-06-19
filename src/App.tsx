@@ -21,6 +21,7 @@ export default function App() {
     baseURL: URL_API_VALIDATOR_AGENT,
     headers: { "Content-Type": "application/json" },
     timeout: 20_000, // evita cuelgues infinitos / 20ms
+    withCredentials: true,
     // validateStatus: () => true,  // descomenta si NO quieres que Axios lance on 4xx/5xx
   });
 
