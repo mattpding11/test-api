@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios, { AxiosError, type RawAxiosRequestHeaders } from "axios";
 import "./App.css";
 
@@ -26,11 +26,6 @@ export default function App() {
   });
 
   console.log({ agentClient });
-
-  // Comprobar AGENTE
-  useEffect(() => {
-    checkAgentConnection()
-  }, []);
 
   console.log({ agentAvailable });
 
@@ -63,18 +58,20 @@ export default function App() {
   // clientKey, // opcional, base64
   // clientCa, // opcional, base64
 
-  const checkAgentConnection = async () => {
-    console.log("checkAgentConnection")
+  // Comprobar AGENTE
+  const checkAgentConnection = useCallback(async () => {
     try {
-      const resp = await agentClient
-        .get("/test");
-      console.log("RESPUESTA OBTENIDA ", { resp });
+      await agentClient.get("/test");
       setAgentAvailable(true);
-    } catch (err) {
-      console.log("ERROR DE CONEXION ", { err });
+    } catch {
       setAgentAvailable(false);
     }
-  }
+  }, [agentClient]);
+
+  //
+  useEffect(() => {
+    checkAgentConnection();
+  }, [checkAgentConnection]);
 
   const sendViaAgent = async (
     method: string,
@@ -138,17 +135,22 @@ export default function App() {
 
   /* ---------- main action ---------- */
   const send = async () => {
-    console.log("ADENTRO");
+    if (!url.trim()) return;
+    try {
+      new URL(url); // validation
+    } catch {
+      return alert("URL inválida");
+    }
 
     setLoading(true);
     setError(null);
     setResponse(null);
-    await checkAgentConnection()
+    await checkAgentConnection();
 
     try {
       const options: any = {
         method,
-        url,
+        url: url.trim(),
       };
 
       const headers = getCleanHeaders();
@@ -172,36 +174,38 @@ export default function App() {
             : "application/json";
         } catch (e) {
           console.log("FAILLLL", e);
-          options.data = body;
+          options.data = body.trim();
         }
       }
 
-      const domains: string[] = [
-        "www.",
-        ".com",
-        ".co",
-        ".org",
-        "localhost",
-        "127.0.0.1",
-        "0.0.0.0",
-        "::1",
-        "https",
-        ".net",
-        ".es",
-        ".edu",
-        ".org"
-      ];
+      // const domains: string[] = [
+      //   ".com",
+      //   ".co",
+      //   ".net",
+      //   ".es",
+      //   ".edu",
+      //   ".org",
+      //   ".gov",
+      //   "localhost",
+      //   "127.0.0.1",
+      //   "0.0.0.0",
+      //   "::1",
+      // ];
 
-      console.log(domains);
+      //     const matchesCaseInsensitive = domains.some((d) =>
+      //   hostname.toLowerCase().includes(d.toLowerCase())
+      // );
+      // console.log({matchesCaseInsensitive}); //
 
-      const matchesCaseInsensitive = domains.some((d) =>
-        url.toLowerCase().includes(d.toLowerCase())
-      );
-      console.log({matchesCaseInsensitive}); //
+      const { hostname } = new URL(url);
+
+      const PRIVATE_IP = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/; // RFC-1918
+
+      const ItsPrivate = PRIVATE_IP.test(hostname);
 
       let res: any;
 
-      if (agentAvailable && !matchesCaseInsensitive) {
+      if (agentAvailable && ItsPrivate) {
         console.log("USA EL AGENTE");
         console.log("REQ AXIOS", options.data);
         res = await sendViaAgent(
@@ -216,7 +220,6 @@ export default function App() {
       }
 
       setResponse(res);
-      
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err); // err es AxiosError
@@ -303,6 +306,11 @@ export default function App() {
           {error.message + "\n"}
           {error.code + "\n"}
           {error.response ? "\nStatus: " + error.response.status : ""}
+          <p style={{color:"cyan"}}>
+            {error.message.toLowerCase().includes("timeout")
+              ? "!VERIFIQUE SI ESTA CONECTADO A LA VPN!"
+              : "" + "\n"}
+          </p>
         </pre>
       )}
       {response && (
