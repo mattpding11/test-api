@@ -20,7 +20,7 @@ export default function App() {
   const agentClient = axios.create({
     baseURL: URL_API_VALIDATOR_AGENT,
     headers: { "Content-Type": "application/json" },
-    timeout: 10000000, // evita cuelgues infinitos
+    timeout: 20_000, // evita cuelgues infinitos / 20ms
     // validateStatus: () => true,  // descomenta si NO quieres que Axios lance on 4xx/5xx
   });
 
@@ -38,13 +38,12 @@ export default function App() {
         console.log("ERROR DE CONEXION ", { err });
         setAgentAvailable(false);
       });
-  }, [agentClient]);
+  }, []);
 
   console.log({ agentAvailable });
 
   if (agentAvailable) {
     console.log("AGENTE CONECTADO");
-
     agentClient
       .options("/preflight")
       .then((res) => {
