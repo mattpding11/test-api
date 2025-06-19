@@ -174,6 +174,7 @@ export default function App() {
       const domains: string[] = [
         "www.",
         ".com",
+        ".co",
         ".org",
         "localhost",
         "127.0.0.1",
@@ -182,7 +183,8 @@ export default function App() {
         "https",
         ".net",
         ".es",
-        ".edu"
+        ".edu",
+        ".org"
       ];
 
       console.log(domains);
