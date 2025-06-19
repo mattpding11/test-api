@@ -19,7 +19,7 @@ export default function App() {
 
   const agentClient = axios.create({
     baseURL: URL_API_VALIDATOR_AGENT,
-    headers: { "Content-Type": "application/json" },
+    // headers: { "Content-Type": "application/json" },
     timeout: 20_000, // evita cuelgues infinitos / 20ms
     withCredentials: true,
     // validateStatus: () => true,  // descomenta si NO quieres que Axios lance on 4xx/5xx
@@ -43,19 +43,19 @@ export default function App() {
 
   console.log({ agentAvailable });
 
-  if (agentAvailable) {
-    console.log("AGENTE CONECTADO");
-    agentClient
-      .options("/preflight")
-      .then((res) => {
-        console.log("preflight: ", { res });
-      })
-      .catch((err) => {
-        console.log("Error preflight: ", { err });
-      });
-  } else {
-    console.log("AGENTE DESCONECTADO");
-  }
+  // if (agentAvailable) {
+  //   console.log("AGENTE CONECTADO");
+  //   agentClient
+  //     .options("/preflight")
+  //     .then((res) => {
+  //       console.log("preflight: ", { res });
+  //     })
+  //     .catch((err) => {
+  //       console.log("Error preflight: ", { err });
+  //     });
+  // } else {
+  //   console.log("AGENTE DESCONECTADO");
+  // }
 
   // Campos que acepta
   // method = "GET",
@@ -171,8 +171,31 @@ export default function App() {
         }
       }
 
+      const domains: string[] = [
+        "www.",
+        ".com",
+        ".org",
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0",
+        "::1",
+        "https",
+        ".net",
+        ".es",
+        ".edu"
+      ];
+
+      console.log(domains);
+
+      const matchesCaseInsensitive = domains.some((d) =>
+        url.toLowerCase().includes(d.toLowerCase())
+      );
+      console.log({matchesCaseInsensitive}); //
+
       let res: any;
-      if (agentAvailable) {
+
+      if (agentAvailable && !matchesCaseInsensitive) {
+        console.log("USA EL AGENTE");
         console.log("REQ AXIOS", options.data);
         res = await sendViaAgent(
           options.method,
@@ -181,6 +204,7 @@ export default function App() {
           options.data || null
         );
       } else {
+        console.log("USA EL NAVEGADOR");
         res = await axios(options);
       }
 
@@ -288,7 +312,7 @@ export default function App() {
 
           {/* body response */}
 
-          <div style={{color:" #0f0"}}>
+          <div style={{ color: " #0f0" }}>
             {"\n\n Response: \n"}
             {typeof response.data === "object"
               ? JSON.stringify(response.data, null, 2)
