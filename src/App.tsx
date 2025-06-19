@@ -29,16 +29,7 @@ export default function App() {
 
   // Comprobar AGENTE
   useEffect(() => {
-    agentClient
-      .get("/test")
-      .then((resp) => {
-        console.log("RESPUESTA OBTENIDA ", { resp });
-        setAgentAvailable(true);
-      })
-      .catch((err) => {
-        console.log("ERROR DE CONEXION ", { err });
-        setAgentAvailable(false);
-      });
+    checkAgentConnection()
   }, []);
 
   console.log({ agentAvailable });
@@ -71,6 +62,19 @@ export default function App() {
   // clientCert, // opcional, base64
   // clientKey, // opcional, base64
   // clientCa, // opcional, base64
+
+  const checkAgentConnection = async () => {
+    console.log("checkAgentConnection")
+    try {
+      const resp = await agentClient
+        .get("/test");
+      console.log("RESPUESTA OBTENIDA ", { resp });
+      setAgentAvailable(true);
+    } catch (err) {
+      console.log("ERROR DE CONEXION ", { err });
+      setAgentAvailable(false);
+    }
+  }
 
   const sendViaAgent = async (
     method: string,
@@ -139,6 +143,7 @@ export default function App() {
     setLoading(true);
     setError(null);
     setResponse(null);
+    await checkAgentConnection()
 
     try {
       const options: any = {
@@ -211,6 +216,7 @@ export default function App() {
       }
 
       setResponse(res);
+      
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err); // err es AxiosError
