@@ -171,14 +171,19 @@ export default function App() {
         }
       }
 
-      console.log("REQ AXIOS", options.data);
-      const res: any = await sendViaAgent(
-        options.method,
-        options.url,
-        options.headers || {},
-        options.data || null
-      );
-      // const res: any = await axios(options);
+      let res: any;
+      if (agentAvailable) {
+        console.log("REQ AXIOS", options.data);
+        res = await sendViaAgent(
+          options.method,
+          options.url,
+          options.headers || {},
+          options.data || null
+        );
+      } else {
+        res = await axios(options);
+      }
+
       setResponse(res);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -283,10 +288,12 @@ export default function App() {
 
           {/* body response */}
 
-          {"\n\n Response: \n"}
-          {typeof response.data === "object"
-            ? JSON.stringify(response.data, null, 2)
-            : String(response.data)}
+          <div style={{color:" #0f0"}}>
+            {"\n\n Response: \n"}
+            {typeof response.data === "object"
+              ? JSON.stringify(response.data, null, 2)
+              : String(response.data)}
+          </div>
         </pre>
       )}
     </div>
