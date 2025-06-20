@@ -96,7 +96,7 @@ export default function App() {
 
     console.log("AGENTE resp.config.baseURL",resp.config?.baseURL)
 
-    console.log("FINAL RESPONSE", data);
+    console.log("FINAL RESPONSE AGENT", data);
 
     return resp.data;
   };
@@ -148,6 +148,8 @@ export default function App() {
     setLoading(true);
     setError(null);
     setResponse(null);
+
+    // Check againt if agent is conneceted
     checkAgentConnection();
 
     try {
@@ -222,10 +224,11 @@ export default function App() {
         console.log("USA EL NAVEGADOR");
         res = await axios(options);
         console.log("BROWSER resp.config.baseURL",res?.config?.baseURL)
+        console.log("FINAL RESPONSE BROWSER", res);
       }
 
-      //example
       setResponse(res);
+      
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err); // err es AxiosError
