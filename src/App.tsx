@@ -224,6 +224,7 @@ export default function App() {
         console.log("BROWSER resp.config.baseURL",res?.config?.baseURL)
       }
 
+      //example
       setResponse(res);
     } catch (err) {
       if (axios.isAxiosError(err)) {
