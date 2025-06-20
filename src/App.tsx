@@ -207,21 +207,23 @@ export default function App() {
 
       const ItsPrivate = PRIVATE_IP.test(hostname);
 
-      let res: any;
+      // let res: any;
 
-      if (agentAvailable && ItsPrivate) {
-        console.log("USA EL AGENTE");
-        console.log("REQ AXIOS", options.data);
-        res = await sendViaAgent(
-          options.method,
-          options.url,
-          options.headers || {},
-          options.data || null
-        );
-      } else {
-        console.log("USA EL NAVEGADOR");
-        res = await axios(options);
-      }
+      // if (agentAvailable && ItsPrivate) {
+      //   console.log("USA EL AGENTE");
+      //   console.log("REQ AXIOS", options.data);
+      //   res = await sendViaAgent(
+      //     options.method,
+      //     options.url,
+      //     options.headers || {},
+      //     options.data || null
+      //   );
+      // } else {
+      //   console.log("USA EL NAVEGADOR");
+      //   res = await axios(options);
+      // }
+
+      const res = await axios(options);
 
       setResponse(res);
     } catch (err) {
