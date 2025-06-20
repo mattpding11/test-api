@@ -145,7 +145,7 @@ export default function App() {
     setLoading(true);
     setError(null);
     setResponse(null);
-    await checkAgentConnection();
+    checkAgentConnection();
 
     try {
       const options: any = {
