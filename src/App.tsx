@@ -1,6 +1,6 @@
 // src/App.jsx
 import { useCallback, useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, type RawAxiosRequestHeaders } from "axios";
 import "./App.css";
 
 // http://localhost:4000/api/v1/test
@@ -73,33 +73,31 @@ export default function App() {
     checkAgentConnection();
   }, [checkAgentConnection]);
 
-  // const sendViaAgent = async (
-  //   method: string,
-  //   url: string,
-  //   headers: RawAxiosRequestHeaders = {},
-  //   data: any = null
-  // ) => {
+  const sendViaAgent = async (
+    method: string,
+    url: string,
+    headers: RawAxiosRequestHeaders = {},
+    data: any = null
+  ) => {
     
-  //   console.log("PETICION ENVIANTE", {
-  //     method: method.toUpperCase(),
-  //     url,
-  //     headers,
-  //     data,
-  //     "xxx":"example",
-  //     [data]: data
-  //   });
+    console.log("PETICION ENVIANTE", {
+      method: method.toUpperCase(),
+      url,
+      headers,
+      data,
+    });
 
-  //   const resp = await agentClient.post("/proxy", {
-  //     method: method.toUpperCase(), // homogeniza
-  //     url,
-  //     headers,
-  //     data
-  //   });
+    const resp = await agentClient.post("/proxy", {
+      method: method.toUpperCase(), // homogeniza
+      url,
+      headers,
+      data
+    });
 
-  //   console.log("FINAL RESPONSE", data);
+    console.log("FINAL RESPONSE", data);
 
-  //   return resp.data;
-  // };
+    return resp.data;
+  };
 
   /* ---------- helpers ---------- */
   const updateHeader = (i: number, field: string, value: string) => {
@@ -120,8 +118,6 @@ export default function App() {
       return setHeaders([{ id: 0, key: "", value: "" }]);
     }
   };
-
-  //
 
   console.log({ headers });
   console.log("headers lenght: ", headers.length);
@@ -209,25 +205,21 @@ export default function App() {
 
       const ItsPrivate = PRIVATE_IP.test(hostname);
 
-      console.log(ItsPrivate)
+      let res: any;
 
-      // let res: any;
-
-      // if (agentAvailable && ItsPrivate) {
-      //   console.log("USA EL AGENTE");
-      //   console.log("REQ AXIOS", options.data);
-      //   res = await sendViaAgent(
-      //     options.method,
-      //     options.url,
-      //     options.headers || {},
-      //     options.data || null
-      //   );
-      // } else {
-      //   console.log("USA EL NAVEGADOR");
-      //   res = await axios(options);
-      // }
-
-      const res = await axios(options);
+      if (agentAvailable && ItsPrivate) {
+        console.log("USA EL AGENTE");
+        console.log("REQ AXIOS", options.data);
+        res = await sendViaAgent(
+          options.method,
+          options.url,
+          options.headers || {},
+          options.data || null
+        );
+      } else {
+        console.log("USA EL NAVEGADOR");
+        res = await axios(options);
+      }
 
       setResponse(res);
     } catch (err) {
