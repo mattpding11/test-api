@@ -94,7 +94,7 @@ export default function App() {
       data
     });
 
-    console.log("resp.config.baseURL",resp.config?.baseURL)
+    console.log("AGENTE resp.config.baseURL",resp.config?.baseURL)
 
     console.log("FINAL RESPONSE", data);
 
@@ -221,7 +221,7 @@ export default function App() {
       } else {
         console.log("USA EL NAVEGADOR");
         res = await axios(options);
-        console.log("resp.config.baseURL",res?.config?.baseURL)
+        console.log("BROWSER resp.config.baseURL",res?.config?.baseURL)
       }
 
       setResponse(res);
