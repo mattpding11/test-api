@@ -77,25 +77,25 @@ export default function App() {
     method: string,
     url: string,
     headers: RawAxiosRequestHeaders = {},
-    body: any = null
+    data: any = null
   ) => {
     console.log("PETICION ENVIANTE", {
       method: method.toUpperCase(),
       url,
       headers,
-      body,
+      data,
     });
 
-    const { data } = await agentClient.post("/proxy", {
+    const resp = await agentClient.post("/proxy", {
       method: method.toUpperCase(), // homogeniza
       url,
       headers,
-      body,
+      data
     });
 
     console.log("FINAL RESPONSE", data);
 
-    return data;
+    return resp.data;
   };
 
   /* ---------- helpers ---------- */
