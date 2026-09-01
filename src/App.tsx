@@ -94,9 +94,9 @@ export default function App() {
       data
     });
 
-    console.log("AGENTE resp.config.baseURL",resp.config?.baseURL)
+    // console.log("AGENTE resp.config.baseURL",resp.config?.baseURL)
 
-    console.log("FINAL RESPONSE AGENT", data);
+    // console.log("FINAL RESPONSE AGENT", data);
 
     return resp.data;
   };
@@ -212,7 +212,7 @@ export default function App() {
       let res: any;
 
       if (agentAvailable && ItsPrivate) {
-        console.log("USA EL AGENTE");
+        // console.log("USA EL AGENTE");
         console.log("REQ AXIOS", options.data);
         res = await sendViaAgent(
           options.method,
@@ -250,9 +250,9 @@ export default function App() {
     <br/>
     &#x2713; // Check */}
       </span>
-      <h4 style={agentAvailable ? { color: "green" } : { color: "red" }}>
+      {/* <h4 style={agentAvailable ? { color: "green" } : { color: "red" }}>
         Agente {agentAvailable ? " Conectado" : " Desconectado"}
-      </h4>
+      </h4> */}
       <div className="row">
         <select value={method} onChange={(e) => setMethod(e.target.value)}>
           <option>GET</option>
